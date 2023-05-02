@@ -90,11 +90,11 @@ class SportsWalking(Training):
 
     def get_spent_calories(self):
         """Получить количество затраченных калорий."""
-        return (((self.weight_coef_2 * self.weight
-                  + ((self.get_mean_speed() * self.KMH_IN_MS) ** self.SQUARE)
-                  / (self.height / self.CM_TO_METERS)
+        return ((self.weight_coef_2 * self.weight
+                + ((self.get_mean_speed() * self.KMH_IN_MS) ** self.SQUARE)
+                / (self.height / self.CM_TO_METERS)
                 * self.weight_coef * self.weight)
-                * self.duration * self.MIN_IN_HOUR))
+                * self.duration * self.MIN_IN_HOUR)
 
 
 class Swimming(Training):
@@ -123,15 +123,21 @@ class Swimming(Training):
 
 def read_package(workout_type: str, data: list) -> Training:
     """Прочитать данные полученные от датчиков."""
-    TRAINING_TYPES = {'SWM': Swimming, 'RUN': Running, 'WLK': SportsWalking}
+    TRAINING_TYPES = {
+        'SWM': (Swimming, 5),
+        'RUN': (Running, 3),
+        'WLK': (SportsWalking, 4),
+    }
     if workout_type not in TRAINING_TYPES:
         raise ValueError(
             f'Неизвестная треннировка {workout_type}.'
             'Доступные треннировки: SWM, RUN, WLK.'
         )
-    if len(data) > 5 or len(data) < 3:
-        raise ValueError('Ошибка типа данных')
-    return TRAINING_TYPES[workout_type](*data)
+    if len(data) != TRAINING_TYPES[workout_type][1]:
+        raise ValueError(
+            f'Для тренировки {workout_type} неверно переданы данные.'
+        )
+    return TRAINING_TYPES[workout_type][0](*data)
 
 
 def main(training: Training) -> None:
